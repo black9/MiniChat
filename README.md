@@ -3,13 +3,13 @@ A simple templet for winsock2 API based on C/S architecture and TCP protocol.
 
 ### Usage
 
-```
+```bash
 cd client
-cmake
-make
+cmake -G "MinGW Makefiles" ./
+make -f ./MakeFile
 
 cd server
-cmake
-make
+cmake -G "MinGW Makefiles" ./
+make -f ./MakeFile
 ```
 

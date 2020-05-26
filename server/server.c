@@ -200,7 +200,7 @@ void* sub_thread(void* p){
                 perror("Error: Sending client list failed.\n");
             }
         }
-        if (strlen(buf) >= 4 && buf[0] == 'S' && buf[1] == 'e' && buf[2] == 'n' && buf[3] == 'd'){
+        if (strlen(buf) >= 4 && strncmp(buf, "Send", 4) == 0){
             // printf("%s", buf);
             int id_dest;
             sscanf(buf+4,"%d", &id_dest);
