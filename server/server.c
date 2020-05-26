@@ -80,9 +80,8 @@ int main(int argc, char* argv[]){
         s_client_list[c_id] = sClient;
         if (sClient == INVALID_SOCKET) {
             perror("Error: Accept faild!\n");
-            closesocket(sListen); //关闭套接字
-            WSACleanup();
-            exit(EXIT_FAILURE);
+            closesocket(sClient); //关闭套接字
+            continue;
         }
         printf("Server: New connection from ip:%s, port:%d, client id %d\n", inet_ntoa(sa_client_list[c_id].sin_addr), ntohs(sa_client_list[c_id].sin_port), c_id);
 
@@ -96,7 +95,9 @@ int main(int argc, char* argv[]){
         if(pthread_create(&p_id , NULL , sub_thread, (void*)p) != 0)
         {
             perror("pthread create error.\n");
-            exit(1);
+            closesocket(sClient); //关闭套接字
+            occupied[c_id] = 0;
+            continue;
         }
         // Todo: free(p)
     }
@@ -133,7 +134,7 @@ void* sub_thread(void* p){
         int tail = recv(sockFd , buf , BUF_SIZE , 0);
         if( tail == -1)
         {
-            printf("Error: Client %d disconnected.\n", id);
+            printf("Client %d disconnected.\n", id);
             occupied[id] = 0;
             closesocket(sockFd);
             break;
@@ -142,12 +143,6 @@ void* sub_thread(void* p){
         buf[tail] = '\0';
         printf("Client%d: %s\n", id, buf);
 
-        // client msg: close
-        if(strcmp(buf, "close") == 0){
-            occupied[id] = 0;
-            closesocket(sockFd);
-            break;
-        }
         if(strcmp(buf, "get_time") == 0){
             //parse time
             time_t rawtime;
