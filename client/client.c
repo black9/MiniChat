@@ -1,6 +1,6 @@
 //
-// Created by 邵尧 on 2020/5/21.
-//
+// Remaked by Black9 on 2021/10/09
+
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -12,7 +12,7 @@
 #include "include/config.h"
 
 int main(int argc, char* argv[]){
-    // start winsock
+    // winsock 시작
     WSADATA wsaData;
     WORD wVersionRequested;
 
@@ -156,7 +156,7 @@ int main(int argc, char* argv[]){
 
 void my_connect(int sockFd){
     pthread_t recv_tid;
-    // must use the value of sockFd rather than the address(&sockFd)
+    // 주소(&sockFd) 대신 sockFd 값을 사용해야 함
     if(pthread_create(&recv_tid , NULL , receive, (void*)sockFd) != 0)
     {
         perror("pthread create error.\n");
