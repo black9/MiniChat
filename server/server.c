@@ -1,6 +1,5 @@
 //
-// Created by 邵尧 on 2020/5/21.
-//
+// Remaked by Black9 on 2021/10/09
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +12,7 @@
 #include "include/config.h"
 
 int main(int argc, char* argv[]){
-    // start winsock
+    // 윈도우 소켓 시작
     WSADATA wsaData;
     WORD wVersionRequested;
     SOCKET sListen;
@@ -34,7 +33,7 @@ int main(int argc, char* argv[]){
         exit(EXIT_FAILURE);
     }
 
-    // initialize
+    // 초기화
     sListen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
     if(sListen == INVALID_SOCKET){
         perror("Error: Create_socket failed\n");
@@ -53,7 +52,7 @@ int main(int argc, char* argv[]){
     if (bind(sListen, (struct sockaddr *)&sa_server, sizeof(sa_server)) == SOCKET_ERROR)
     {
         perror("Error: Binding faild!\n");
-        closesocket(sListen); //关闭套接字
+        closesocket(sListen); //소켓 닫기
         WSACleanup();
         exit(EXIT_FAILURE);
     }
@@ -63,7 +62,7 @@ int main(int argc, char* argv[]){
     if (listen(sListen, WAIT_LIST_LEN) == SOCKET_ERROR)
     {
         perror("Error: Listen faild!\n");
-        closesocket(sListen); //关闭套接字
+        closesocket(sListen); //소켓 닫기
         WSACleanup();
         exit(EXIT_FAILURE);
     }
@@ -80,27 +79,26 @@ int main(int argc, char* argv[]){
         s_client_list[c_id] = sClient;
         if (sClient == INVALID_SOCKET) {
             perror("Error: Accept faild!\n");
-            closesocket(sClient); //关闭套接字
+            closesocket(sClient); //소켓 닫기
             continue;
         }
         printf("Server: New connection from ip:%s, port:%d, client id %d\n", inet_ntoa(sa_client_list[c_id].sin_addr), ntohs(sa_client_list[c_id].sin_port), c_id);
 
         occupied[c_id] = 1;
-        // new thread
+        // 새로운 쓰레드 
         pthread_t p_id;
-        // init params
+        // 매개변수 초기화
         struct params* p = (struct params *)malloc(sizeof(struct params));
         p->sockFd = sClient;
         p->id = c_id;
         if(pthread_create(&p_id , NULL , sub_thread, (void*)p) != 0)
         {
             perror("pthread create error.\n");
-            closesocket(sClient); //关闭套接字
+            closesocket(sClient); //소켓 닫기
             occupied[c_id] = 0;
             continue;
         }
-        // Todo: free(p)
-    }
+            }
 
     return 0;
 }
@@ -119,7 +117,7 @@ void* sub_thread(void* p){
     SOCKET sockFd = pp->sockFd;
     int id = pp->id;
 
-    // send hello message
+    // hello 메세지 보내기
     char hello_msg[BUF_SIZE] = "\0";
     get_hello_msg(id, hello_msg);
     if(send(sockFd, hello_msg, strlen(hello_msg), 0) == -1){
@@ -144,14 +142,14 @@ void* sub_thread(void* p){
         printf("Client%d: %s\n", id, buf);
 
         if(strcmp(buf, "get_time") == 0){
-            //parse time
+            // 시간 
             time_t rawtime;
             struct tm * timeinfo;
             time ( &rawtime );
             timeinfo = localtime ( &rawtime );
             char msg[BUF_SIZE];
             strcpy(msg, asctime (timeinfo));
-            //send time to client
+            // 클라이언트한테 시간 전송
             int res = send(sockFd, msg, strlen(msg), 0);
             if(res == -1){
                 perror("Error: Sending time failed.\n");
