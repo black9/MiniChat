@@ -12,7 +12,7 @@
 #include "include/config.h"
 
 int main(int argc, char* argv[]){
-    // 윈도우 소켓 시작
+    // winsock2 소켓 시작
     WSADATA wsaData;
     WORD wVersionRequested;
     SOCKET sListen;
