@@ -1,6 +1,5 @@
 //
-// Created by 邵尧 on 2020/5/21.
-//
+// Remaked by Black9 on 2021/10/09
 
 #ifndef MINISOCKETCLIENT_CLIENT_H
 #define MINISOCKETCLIENT_CLIENT_H
@@ -24,4 +23,4 @@ void get_client_list(int sockFd);
 void send_msg(int sockFd, int dest_id, char* s_msg);
 void my_exit(int sockFd);
 
-#endif //MINISOCKETCLIENT_CLIENT_H
+#endif // 미니소켓서버_server_헤더
