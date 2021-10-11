@@ -12,41 +12,43 @@
 #include "include/config.h"
 
 int main(int argc, char* argv[]){
-    // winsock2 소켓 시작
+    //소켓 초기화에 대한 결과를 받아주는 구조체
     WSADATA wsaData;
     WORD wVersionRequested;
     SOCKET sListen;
     SOCKET sClient;
     struct sockaddr_in sa_server;
 
-    wVersionRequested = MAKEWORD( 2, 2 );
-    if ( WSAStartup( wVersionRequested, &wsaData ) != 0 )
+    wVersionRequested = MAKEWORD( 2, 2 ); //Winsock 초기화
+    if ( WSAStartup( wVersionRequested, &wsaData ) != 0 ) //SOCKET_ERROR는 -1과 같습니다. WSAStartup 성공시에는 0을, 실패시에는 -1을 반환
     {
-        perror("Error: WSA start failed\n");
-        exit(EXIT_FAILURE);
+        perror("Error: WSA start failed\n"); //오류시 WSA 시작 실패 출력
+        exit(EXIT_FAILURE);  //비정상 종료
+    }
+    
+
+    if ( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 ) //초기화하고자 했던 버전이 제대로 되었는지 확인
+    {
+        perror("Error: Invalid winsock version\n"); // 잘못된 Winsock 버전일시 출력
+        WSACleanup( );//WSACleanup()이 성공하면 0, 실패하면 -1을 반환
+        exit(EXIT_FAILURE); //비정상 종료
     }
 
-    if ( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 )
-    {
-        perror("Error: Invalid winsock version\n");
-        WSACleanup( );
-        exit(EXIT_FAILURE);
-    }
-
-    // 초기화
-    sListen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
+    
+    sListen = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP); //IPv4 인터넷 프로토콜 체계에서 동작하는 연결지향형 TCP 소켓을 생성하여 반환
     if(sListen == INVALID_SOCKET){
-        perror("Error: Create_socket failed\n");
-        exit(EXIT_FAILURE);
+        perror("Error: Create_socket failed\n"); //잘못된 소켓 일시 출력
+        exit(EXIT_FAILURE); //비정상 종료
     }
     memset(occupied, 0, sizeof(occupied));
 
-    printf("Initialize complete.\n");
+    printf("Initialize complete.\n"); //초기화 완료 메세지 출력
 
     memset(&sa_server, 0, sizeof(sa_server));
-    sa_server.sin_family = AF_INET;
-    sa_server.sin_addr.S_un.S_addr = htonl(INADDR_ANY);
-    sa_server.sin_port = htons(SERVER_PORT);
+    sa_server.sin_family = AF_INET; //AF_INET : internet family IPv4 사용
+    sa_server.sin_addr.S_un.S_addr = htonl(INADDR_ANY); ///ip addr, Host TO Network Long 서버 ip 지정
+    sa_server.sin_port = htons(SERVER_PORT); ///Host TO Network Short 서버 포트 지정
+
 
     //binding
     if (bind(sListen, (struct sockaddr *)&sa_server, sizeof(sa_server)) == SOCKET_ERROR)
